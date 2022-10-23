@@ -345,7 +345,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: desktop/build/compose/jars/AnimationGarden-linux-x64-${{ steps.tag-version.outputs.substring }}.jar
+          asset_path: desktop/build/compose/jars/AnimationGarden-linux-x64-${{ steps.tag-version-without-metadata.outputs.substring }}.jar
           asset_name: AnimationGarden-${{ steps.tag-version-without-v.outputs.substring }}-debian-amd64.jar
           asset_content_type: application/octet-stream
     outputs:
