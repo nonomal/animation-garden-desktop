@@ -92,6 +92,7 @@ jobs:
             const { tag } = process.env;
             let tag1 = tag.split('-')[0]; // substring before '-'
             core.setOutput('tag', tag1);
+            core.setOutput('substring', tag1);
 
       - if: ${{ env.isUnix == 'true' }}
         uses: actions/setup-java@v2
