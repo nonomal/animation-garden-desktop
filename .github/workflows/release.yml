@@ -84,7 +84,7 @@ jobs:
           default_return_value: ${{ steps.tag.outputs.tag }}
 
       - id: tag-version-without-metadata
-        uses: actions/github-script@6
+        uses: actions/github-script@v6
         env:
           tag: ${{ steps.tag-version-without-v.outputs.value }}
         with:
