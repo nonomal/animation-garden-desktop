@@ -1,82 +1,152 @@
-# 动漫花园
+| 下載量                                                                                                                                                                                                                | 正式版↓                                                                                                                                                                         | 測試版↓                                                                                                                                                                                    | 討論群                                                                                                                                                                                                                                                                                                                                                                                                           |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [![GitHub downloads](https://img.shields.io/github/downloads/open-ani/ani/total?label=Downloads&labelColor=27303D&color=0D1117&logo=github&logoColor=FFFFFF&style=flat)](https://github.com/open-ani/ani/releases) | [![Stable](https://img.shields.io/github/release/open-ani/ani.svg?maxAge=3600&label=Stable&labelColor=06599d&color=043b69)](https://github.com/open-ani/ani/releases/latest) | [![Beta](https://img.shields.io/github/v/release/open-ani/ani.svg?maxAge=3600&label=Beta&labelColor=2c2c47&color=1c1c39&include_prereleases)](https://github.com/open-ani/ani/releases) | [![Group](https://img.shields.io/badge/Telegram-2CA5E0?style=flat-squeare&logo=telegram&logoColor=white)](https://t.me/openani) [![QQ](https://img.shields.io/badge/927170241-EB1923?logo=tencent-qq&logoColor=white)](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=2EbZ0Qxe-fI_AHJLCMnSIOnqw-nfrFH5&authKey=L31zTMwfbMG0FhIgt8xNHGOFPHc531mSw2YzUVupHLRJ4L2f8xerAd%2ByNl4OigRK&noverify=0&group_code=927170241) |
 
-[动漫花园]: http://www.dmhy.org/
+<a href="https://www.myani.org">
+    <img src="./.github/assets/logo.png" alt="Ani logo" title="Ani logo" width="80"/>
+</a>
+
+# Ani
+
+[dmhy]: http://www.dmhy.org/
+
+[Bangumi]: http://bangumi.tv
+
+[ddplay]: https://www.dandanplay.com/
 
 [Compose Multiplatform]: https://www.jetbrains.com/lp/compose-mpp/
 
-美观且实用的[动漫花园]的多平台应用程序，使用 [Compose Multiplatform] 构建。
+[acg.rip]: https://acg.rip
+
+[Mikan]: https://mikanani.me/
+
+[Ikaros]: https://ikaros.run/
+
+集找番、追番、看番的一站式弹幕追番平台。
+
+Ani 的目标是提供尽可能简单且舒适的追番体验。
+
+支持云同步观看记录 ([Bangumi][Bangumi]), 多视频数据源, 缓存, 弹幕, 以及更多功能。
+
+> 我不是专业客户端开发人员, 开发纯属兴趣, 不过有点讲究代码质量, 欢迎各位指点.
+
+## 技术总览
+
+以下几点可以给你一个技术上的大概了解, 不感兴趣的可以直接看[截图](#功能截图).
+
+- Kotlin 多平台架构: Android + 桌面 JVM，绝大部分代码共享在 app/shared
+- UI 100% [Compose][Compose Multiplatform]
+- Compose 弹幕引擎，自建弹幕服务器+网络弹幕源，预留接入其他弹幕数据源的接口
+- Compose 视频播放器，Android 底层为 ExoPlayer，PC 底层为 VLC
+- 独立的抽象数据源对接模块：SPI 方式加载 [动漫花园][dmhy]、[acg.rip][acg.rip]、[Mikan][Mikan]
+  等。现阶段支持代码里扩展私有数据源，局域网缓存服务器等。未来计划开放 API
+
+### 参与开发
+
+欢迎你提交 PR 参与开发, 也欢迎加入 open-ani 组织。
+有关项目技术细节请参考 [CONTRIBUTING](CONTRIBUTING.md)。
 
 ## 下载
 
-此应用支持 macOS、Ubuntu、Windows 与 Android。
-可在 [releases](https://github.com/Him188/animation-garden-desktop/releases/latest) 中的 "Assets" 下载最新正式版本。
+Ani 支持 Android 和桌面端 (macOS、Windows)。
 
-测试版本可以在 [releases](https://github.com/Him188/animation-garden-desktop/releases/) 找到。使用测试版本可以体验最新特性，但可能会遇到一些问题。
+下载:
 
-对于所有桌面平台：
+- 稳定版本: 每两周更新, 功能稳定  
+  [下载稳定版本](https://github.com/Him188/ani/releases/latest)
+- 测试版本: 每两天更新, 体验最新功能  
+  [下载测试版本](https://github.com/Him188/ani/releases)
 
-- `.zip` 是包含 JRE 的解压即用的绿色版本；
-- `.dmg`、`.deb` 和 `.msi` 分别对应 macOS、Ubuntu 和 Windows 的安装程序；
-- `.jar` 是不包含 JRE 的最小程序，需要配合 JRE 11 及以上使用。
+## 功能截图
 
-对于 Android，请下载 `.apk` 安装包使用。
+快速开发中, 我每隔几天会更一下截图. 实际样式请以最新版本为准.
 
-Android 版与桌面版的功能是一样的。
+### 管理追番
 
-## 参与
+- 同步 [Bangumi][Bangumi] 收藏, 记录观看进度
 
-欢迎你提交 [PR](https://github.com/Him188/animation-garden-desktop/pulls) [参与开发](CONTRIBUTING.md)。
+<img width="300" src=".readme/images/collection/collection-dark.jpg" alt="collection-dark"/> <img width="300" src=".readme/images/subject/subject-dark.jpg" alt="subject-dark"/>
 
-由于我家有咖啡机，就不需要你捐助咖啡了，谢谢你。
+<img width="600" src=".readme/images/collection/collection-desktop.png" alt="collection-desktop"/>
 
-## 提示
+### 多数据源在线视频播放
 
-#### 访问动漫花园
+多数据源适配, 总有一个源有你想看的番和喜欢的字幕组
 
-动漫花园在中国大陆无法通过 IPv4 访问。你可能需要一些技术手段，或者使用 IPv6，才能正常使用。
+- 全自动整合多个 BT 数据源与在线数据源, 兼顾资源质量与缓冲速度
+- 自动解析资源信息, 可配置的智能选择算法完全避免找资源的麻烦
+- 记忆偏好选项
 
-在桌面端，可以在设置（Windows 在标题栏，macOS 在屏幕左上角点击"动漫花园"）中设置使用代理。代理是默认禁用的。初始的 HTTP 代理设置为连接本地 Clash 并使用 Clash 的默认端口。
+<img width="270" src=".readme/images/episode/episode-player-loading.jpg" alt="episode-player-loading"/> <img width="270" src=".readme/images/episode/episode-stats.jpg" alt="episode-stats"/> <img width="270" src=".readme/images/episode/episode-media.jpg" alt="episode-media"/> 
 
-#### 额外设置
+### 视频弹幕
 
-部分桌面端会支持额外设置，这些设置都可以由上述方法看到，如果看不到就是没有。例如 macOS 端支持窗口沉浸（将背景颜色绘制到标题栏内，默认启用）。
+- 从[弹弹play][ddplay], *其他弹幕网站*, 以及 Ani 弹幕服务获取弹幕
+- 自定义弹幕样式与速度
+- 发送弹幕到 Ani 的公益弹幕服务器
 
-## 功能
+<img width="600" src=".readme/images/episode/player-controller.jpeg" alt="player-controller"/>
 
-### 查看最新话题
+> 你可能注意到了, 图里的 "广告位招租" 其实是开玩笑,
+> 有其他有意思的弹幕广告词创意欢迎[提交](https://github.com/Him188/ani/discussions/120)
 
-打开应用即可看到最新话题列表。话题列表是一个无限流，当滑动到最低端时，它将加载更多内容。
+<img width="600" src=".readme/images/episode/player-danmaku.jpeg" alt="player-danmaku"/>
 
-![](.README_images/main-appearance.png)
+<img width="600" src=".readme/images/episode/player-settings.jpeg" alt="player-settings"/>
 
-### 以作品为中心搜索
+<img width="600" src=".readme/images/episode/episode-play-desktop.png" alt="episode-play-desktop"/>
 
-可根据关键词搜索话题。应用将自动识别该关键词对应的作品信息，并统合搜索结果，以作品为中心查看结果。
+<img width="600" src=".readme/images/episode/player-gesture.jpeg" alt="episode-gesture"/>
 
-![](.README_images/searching-for-topics-by-keywords.png)
+### 资源偏好设置
 
-### 过滤标签
+- 设置全局优先选择的字幕组, 字幕语言等设置
+- 在观看时修改过滤可自动记忆并应用到下次播放和自动缓存
 
-在统合搜索结果中点击标签可以执行过滤，快速查找想要的内容。
+<img width="300" src=".readme/images/preferences/preferences-media.jpg"  alt="subtitle-language.jpg"/>  
 
-![](.README_images/filtering-topics.png)
+### 视频缓存
 
-### 收藏作品并记忆搜索偏好和观看记录
+- 自动根据资源偏好设置缓存观看进度的下一集
+- 管理缓存的所有视频
+- 按番剧分类管理
 
-点击卡片右上角的五角星即可添加或取消收藏。收藏的作品会记忆搜索偏好以及剧集观看记录。在查看收藏列表时会自动更新剧集列表，点击剧集可跳转搜索。
+<img width="270" src=".readme/images/preferences/cache.jpg"  alt="cache.jpg"/> <img width="270" src=".readme/images/subject/subject-cache.jpg"  alt="subject-cache.jpg"/> <img width="270" src=".readme/images/preferences/global-caches.jpg"  alt="global-caches.jpg"/> 
 
-![](.README_images/star-and-remembering.gif)
+### 完全免费无广告且开放源代码
 
-### 多端即时同步
+- 使用靠谱的 [Bangumi][Bangumi] 记录追番数据, 不怕网站跑路丢失数据
+- 视频播放使用 P2P 资源, 无服务器维护成本, ~即使我跑路了 Ani 也能用~
+- 开放源代码, 公开自动构建, 无资料泄露风险
+- 可 PR 添加自己喜欢的功能
 
-使用同一个同步 token 时，在一个客户端进行修改可以即时同步到其他在线客户端，确保流畅体验。
+### 代理设置
 
-要启用同步，请在设置中勾选 "与服务器同步"。所有客户端都支持多端即时同步。
+Ani 自带不需要代理的数据源，无需配置代理。
+若你想要，也可以设置代理后使用所有数据源。
 
-### 界面简洁流畅
+<img width="300" src=".readme/images/preferences/preferences-network-proxy.jpg" alt="preferences-network-proxy"/> <img width="300" src=".readme/images/preferences/preferences-network-danmaku.jpg" alt="preferences-network-danmaku"/>
 
-[MD3]: https://m3.material.io/
+## FAQ
 
-应用采用 [质感设计 3][MD3]，界面简洁而功能齐全。所有动作都配有流畅的动画。针对多平台设计，应用支持无极可调窗口大小。
+### 资源来源是什么?
 
-![](.README_images/resizable-window.gif)
+全部视频数据都来自网络, Ani 本身不存储任何视频数据。
+Ani 支持两大数据源类型：BT 和在线。BT 源即为公共 BitTorrent P2P 网络，
+每个在 BT
+网络上的人都可分享自己拥有的资源供他人下载。在线源即为其他视频资源网站分享的内容。Ani 本身并不提供任何视频资源。
+
+本着互助精神，使用 BT 源时 Ani 会自动做种 (分享数据)。
+BT 指纹为 `-aniLT3000-`，其中 `3000` 为版本号；UA 为类似 `ani_libtorrent/3.0.0`。
+
+### 弹幕来源是什么?
+
+Ani 拥有自己的公益弹幕服务器，在 Ani 应用内发送的弹幕将会发送到弹幕服务器上。每条弹幕都会以 Bangumi
+用户名绑定以防滥用（并考虑未来增加举报和屏蔽功能）。
+
+Ani 还会从[弹弹play][ddplay]获取关联弹幕，弹弹play还会从其他弹幕平台例如哔哩哔哩港澳台和巴哈姆特获取弹幕。
+番剧每集可拥有几十到几千条不等的弹幕量。
+
+#### 弹幕过滤
+
+我们已经听到了许多用户关注弹幕的质量的请求。Ani 有 AI 团队正在研发云过滤模型，将逐渐推进云过滤功能。

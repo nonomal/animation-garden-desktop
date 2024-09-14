@@ -1,6 +1,6 @@
 /*
- * Animation Garden App
- * Copyright (C) 2022  Him188
+ * Ani
+ * Copyright (C) 2022-2024 Him188
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,39 @@ plugins {
 
 repositories {
     mavenCentral()
+    google()
+    gradlePluginPortal()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev") // Compose Multiplatform pre-release versions
+}
+
+kotlin {
+    jvmToolchain(17)
+    compilerOptions {
+        optIn.add("org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi")
+    }
 }
 
 dependencies {
-    gradleApi()
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+}
+
+dependencies {
+    api(gradleApi())
+    api(gradleKotlinDsl())
+
+    api(libs.kotlin.gradle.plugin) {
+        exclude("org.jetbrains.kotlin", "kotlin-stdlib")
+        exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
+        exclude("org.jetbrains.kotlin", "kotlin-reflect")
+    }
+
+    api(libs.android.gradle.plugin)
+    api(libs.atomicfu.gradle.plugin)
+    api(libs.android.application.gradle.plugin)
+    api(libs.android.library.gradle.plugin)
+    api(libs.compose.multiplatfrom.gradle.plugin)
+    api(libs.kotlin.compose.compiler.gradle.plugin)
+    implementation(kotlin("script-runtime"))
+    implementation(libs.snakeyaml)
 }
