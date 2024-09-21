@@ -9,15 +9,24 @@
 
 package me.him188.ani.app.ui.settings.mediasource.rss
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
@@ -30,6 +39,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowWidthSizeClass
@@ -37,18 +49,26 @@ import me.him188.ani.app.data.source.media.source.RssMediaSource
 import me.him188.ani.app.data.source.media.source.RssMediaSourceArguments
 import me.him188.ani.app.data.source.media.source.RssSearchConfig
 import me.him188.ani.app.ui.foundation.layout.AnimatedPane1
+import me.him188.ani.app.ui.foundation.layout.PaddingValuesSides
 import me.him188.ani.app.ui.foundation.layout.ThreePaneScaffoldValueConverter.ExtraPaneForNestedDetails
 import me.him188.ani.app.ui.foundation.layout.convert
-import me.him188.ani.app.ui.foundation.layout.materialWindowMarginPadding
+import me.him188.ani.app.ui.foundation.layout.only
+import me.him188.ani.app.ui.foundation.layout.panePadding
 import me.him188.ani.app.ui.foundation.navigation.BackHandler
 import me.him188.ani.app.ui.foundation.theme.AniThemeDefaults
 import me.him188.ani.app.ui.foundation.widgets.TopAppBarGoBackButton
+import me.him188.ani.app.ui.settings.mediasource.DropdownMenuExport
+import me.him188.ani.app.ui.settings.mediasource.DropdownMenuImport
+import me.him188.ani.app.ui.settings.mediasource.MediaSourceConfigurationDefaults
 import me.him188.ani.app.ui.settings.mediasource.rss.detail.RssDetailPane
 import me.him188.ani.app.ui.settings.mediasource.rss.detail.SideSheetPane
 import me.him188.ani.app.ui.settings.mediasource.rss.edit.RssEditPane
 import me.him188.ani.app.ui.settings.mediasource.rss.test.RssTestPane
 import me.him188.ani.app.ui.settings.mediasource.rss.test.RssTestPaneState
 import me.him188.ani.datasources.api.Media
+import me.him188.ani.datasources.api.source.MediaSourceConfig
+import me.him188.ani.datasources.api.source.deserializeArgumentsFromString
+import me.him188.ani.datasources.api.source.serializeArgumentsToString
 
 /**
  * 整个编辑 RSS 数据源页面的状态. 对于测试部分: [RssTestPaneState]
@@ -57,7 +77,7 @@ import me.him188.ani.datasources.api.Media
  */
 @Stable
 class EditRssMediaSourceState(
-    argumentsStorage: SaveableStorage<RssMediaSourceArguments>,
+    private val argumentsStorage: SaveableStorage<RssMediaSourceArguments>,
     val instanceId: String,
 ) {
     private val arguments by argumentsStorage.containerState
@@ -101,6 +121,22 @@ class EditRssMediaSourceState(
             filterBySubjectName = filterBySubjectName,
         )
     }
+
+    fun parseSerializedArguments(string: String): RssMediaSourceArguments? {
+        return kotlin.runCatching {
+            MediaSourceConfig.deserializeArgumentsFromString(RssMediaSourceArguments.serializer(), string)
+        }.getOrNull()
+    }
+
+    fun serializeArguments(): String? {
+        return arguments?.let {
+            MediaSourceConfig.serializeArgumentsToString(RssMediaSourceArguments.serializer(), it)
+        }
+    }
+
+    fun import(arguments: RssMediaSourceArguments) {
+        argumentsStorage.set(arguments)
+    }
 }
 
 @Composable
@@ -134,11 +170,49 @@ fun EditRssMediaSourcePage(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(state.displayName.ifEmpty { "新建数据源" })
+                    AnimatedContent(
+                        navigator.currentDestination?.pane,
+                        transitionSpec = AniThemeDefaults.standardAnimatedContentTransition,
+                    ) {
+                        when (it) {
+                            ListDetailPaneScaffoldRole.List -> Text(state.displayName)
+                            ListDetailPaneScaffoldRole.Detail -> Text("测试数据源")
+                            ListDetailPaneScaffoldRole.Extra -> Text("详情")
+                            else -> Text(state.displayName)
+                        }
+                    }
                 },
                 navigationIcon = { TopAppBarGoBackButton() },
                 colors = AniThemeDefaults.topAppBarColors(),
                 windowInsets = windowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
+                actions = {
+                    if (navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Hidden) {
+                        TextButton({ navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) }) {
+                            Text("测试")
+                        }
+                    }
+                    Box {
+                        var showDropdown by remember { mutableStateOf(false) }
+                        IconButton({ showDropdown = true }) {
+                            Icon(Icons.Rounded.MoreVert, "更多")
+                        }
+                        DropdownMenu(showDropdown, { showDropdown = false }) {
+                            MediaSourceConfigurationDefaults.DropdownMenuImport(
+                                parseContent = { state.parseSerializedArguments(it) },
+                                onImport = {
+                                    state.import(it)
+                                    showDropdown = false
+                                },
+                                enabled = !state.isLoading,
+                            )
+                            MediaSourceConfigurationDefaults.DropdownMenuExport(
+                                encode = { state.serializeArguments() },
+                                onDismissRequest = { showDropdown = false },
+                                enabled = !state.isLoading,
+                            )
+                        }
+                    }
+                },
             )
         },
         contentWindowInsets = windowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
@@ -147,6 +221,8 @@ fun EditRssMediaSourcePage(
             navigator.navigateBack()
         }
 
+        val panePadding = currentWindowAdaptiveInfo().windowSizeClass.panePadding
+        val panePaddingVertical = panePadding.only(PaddingValuesSides.Vertical)
         ListDetailPaneScaffold(
             navigator.scaffoldDirective,
             navigator.scaffoldValue.convert(ExtraPaneForNestedDetails),
@@ -154,10 +230,8 @@ fun EditRssMediaSourcePage(
                 AnimatedPane1 {
                     RssEditPane(
                         state = state,
-                        onClickTest = { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail) },
-                        showTestButton = navigator.scaffoldValue.primary == PaneAdaptedValue.Hidden,
                         Modifier.fillMaxSize(),
-                        contentPadding = paddingValues,
+                        contentPadding = panePaddingVertical,
                     )
                 }
             },
@@ -167,11 +241,14 @@ fun EditRssMediaSourcePage(
                         testState,
                         { navigator.navigateTo(ListDetailPaneScaffoldRole.Extra) },
                         Modifier.fillMaxSize(),
-                        contentPadding = paddingValues,
+                        contentPadding = panePaddingVertical,
                     )
                 }
             },
-            Modifier.materialWindowMarginPadding(),
+            Modifier
+                .padding(paddingValues)
+                .consumeWindowInsets(paddingValues)
+                .padding(panePadding.only(PaddingValuesSides.Horizontal)),
             extraPane = {
                 AnimatedPane1 {
                     Crossfade(testState.viewingItem) { item ->
@@ -179,7 +256,7 @@ fun EditRssMediaSourcePage(
                         if (currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass != WindowWidthSizeClass.COMPACT) {
                             SideSheetPane(
                                 onClose = { navigator.navigateBack() },
-                                Modifier.padding(paddingValues),
+                                Modifier.padding(panePaddingVertical),
                             ) {
                                 RssDetailPane(
                                     item,
@@ -194,7 +271,7 @@ fun EditRssMediaSourcePage(
                                 mediaDetailsColumn = mediaDetailsColumn,
                                 Modifier
                                     .fillMaxSize(),
-                                contentPadding = paddingValues,
+                                contentPadding = panePaddingVertical,
                             )
                         }
                     }

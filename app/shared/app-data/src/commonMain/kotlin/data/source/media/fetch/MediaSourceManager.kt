@@ -1,3 +1,12 @@
+/*
+ * Copyright (C) 2024 OpenAni and contributors.
+ *
+ * 此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ * Use of this source code is governed by the GNU AGPLv3 license, which can be found at the following link.
+ *
+ * https://github.com/open-ani/ani/blob/main/LICENSE
+ */
+
 package me.him188.ani.app.data.source.media.fetch
 
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -27,6 +36,7 @@ import me.him188.ani.app.data.source.media.instance.MediaSourceSave
 import me.him188.ani.app.data.source.media.source.RssMediaSource
 import me.him188.ani.app.platform.getAniUserAgent
 import me.him188.ani.app.tools.ServiceLoader
+import me.him188.ani.datasources.api.matcher.MediaSourceWebVideoMatcherLoader
 import me.him188.ani.datasources.api.source.FactoryId
 import me.him188.ani.datasources.api.source.MediaFetchRequest
 import me.him188.ani.datasources.api.source.MediaSource
@@ -70,6 +80,8 @@ interface MediaSourceManager { // available by inject
      * 根据启用的 [MediaSourceInstance] 创建的 [MediaSourceMediaFetcher].
      */
     val mediaFetcher: Flow<MediaFetcher>
+
+    val webVideoMatcherLoader: MediaSourceWebVideoMatcherLoader
 
     fun isLocal(factoryId: FactoryId): Boolean = isLocal(factoryId.value)
     fun isLocal(mediaSourceId: String): Boolean {
@@ -206,7 +218,7 @@ class MediaSourceManagerImpl(
     private fun createInstance(save: MediaSourceSave, config: MediaSourceProxySettings): MediaSourceInstance? {
         val factory = factories.find { it.factoryId == save.factoryId }
         return if (factory == null) {
-            logger.error { "MediaSourceFactory not found for ${save.mediaSourceId}" }
+            logger.error { "MediaSourceFactory '${save.factoryId}' not found for ${save.mediaSourceId}" }
             null
         } else {
             MediaSourceInstance(
@@ -231,6 +243,9 @@ class MediaSourceManagerImpl(
             mediaSources = instances,
         )
     }
+    override val webVideoMatcherLoader: MediaSourceWebVideoMatcherLoader = MediaSourceWebVideoMatcherLoader(
+        allInstances.map { list -> list.map { it.source } },
+    )
 
     override fun instanceConfigFlow(instanceId: String): Flow<MediaSourceConfig?> {
         return instances.flow.map { list ->

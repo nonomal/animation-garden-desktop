@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.NavigationRailDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -41,6 +40,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.io.files.Path
 import me.him188.ani.app.data.repository.SettingsRepository
 import me.him188.ani.app.data.source.UpdateManager
+import me.him188.ani.app.data.source.media.fetch.MediaSourceManager
 import me.him188.ani.app.data.source.media.resolver.DesktopWebVideoSourceResolver
 import me.him188.ani.app.data.source.media.resolver.HttpStreamingVideoSourceResolver
 import me.him188.ani.app.data.source.media.resolver.LocalFileVideoSourceResolver
@@ -77,6 +77,7 @@ import me.him188.ani.app.ui.foundation.layout.LocalPlatformWindow
 import me.him188.ani.app.ui.foundation.layout.isSystemInFullscreen
 import me.him188.ani.app.ui.foundation.navigation.LocalOnBackPressedDispatcherOwner
 import me.him188.ani.app.ui.foundation.navigation.SkikoOnBackPressedDispatcherOwner
+import me.him188.ani.app.ui.foundation.theme.AniThemeDefaults
 import me.him188.ani.app.ui.foundation.widgets.LocalToaster
 import me.him188.ani.app.ui.foundation.widgets.Toast
 import me.him188.ani.app.ui.foundation.widgets.ToastViewModel
@@ -207,7 +208,7 @@ object AniDesktop {
                                 .map { TorrentVideoSourceResolver(it) }
                                 .plus(LocalFileVideoSourceResolver())
                                 .plus(HttpStreamingVideoSourceResolver())
-                                .plus(DesktopWebVideoSourceResolver()),
+                                .plus(DesktopWebVideoSourceResolver(get<MediaSourceManager>().webVideoMatcherLoader)),
                         )
                     }
                     single<UpdateInstaller> { DesktopUpdateInstaller.currentOS() }
@@ -313,7 +314,7 @@ private fun FrameWindowScope.MainWindowContent(
     aniNavigator: AniNavigator,
 ) {
     AniApp {
-        window.setTitleBarColor(NavigationRailDefaults.ContainerColor)
+        window.setTitleBarColor(AniThemeDefaults.navigationContainerColor)
 
         Box(
             Modifier
