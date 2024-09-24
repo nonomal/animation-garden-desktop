@@ -60,14 +60,14 @@ import me.him188.ani.app.ui.home.search.SubjectPreviewColumn
 import me.him188.ani.app.ui.home.search.SubjectSearchBar
 
 @Composable
-fun HomePage(
+fun SearchPage(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     searchBarFocusRequester: FocusRequester = remember { FocusRequester() },
     contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
 ) {
-    val searchViewModel = viewModel { SearchViewModel() }
-    val snackBarHostState = remember { SnackbarHostState() }
+    val searchViewModel = viewModel { SearchViewModel() } // 改成SubjectSearchState(无injection， 可以依赖于其他的state)
+    val snackBarHostState = remember { SnackbarHostState() } // 改成toaster
     val layoutDirection = LocalLayoutDirection.current
 
     val searchTag by searchViewModel.searchTags.collectAsStateWithLifecycle()
